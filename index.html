@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Deevora - Connect Beyond</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="google-site-verification" content="5bGwiK5d-UJl66ablNELEvM0WSyzjw_MOzX_5Qb5F84" />
+
+<style>
+
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#667eea,#764ba2);
+color:white;
+}
+
+/* LOGIN */
+
+#loginPage{
+display:flex;
+height:100vh;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+}
+
+input{
+padding:10px;
+margin:8px;
+border:none;
+border-radius:5px;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+background:#ff9800;
+color:white;
+font-weight:bold;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+/* MAIN APP */
+
+#app{
+display:none;
+padding:15px;
+animation:fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.profile-img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+}
+
+.post-box{
+margin-top:15px;
+}
+
+.post{
+background:white;
+color:black;
+padding:10px;
+border-radius:8px;
+margin-top:10px;
+animation:fadeIn 0.4s ease-in-out;
+}
+
+.story{
+display:inline-block;
+background:white;
+color:black;
+padding:8px;
+margin:5px;
+border-radius:20px;
+cursor:pointer;
+}
+
+.notification{
+background:#ff5722;
+padding:5px 10px;
+border-radius:20px;
+font-size:12px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+<h1>Welcome to Deevora 🔥</h1>
+<input type="text" id="username" placeholder="Enter Username">
+<button onclick="login()">Login</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+
+<div class="topbar">
+<h2>Deevora</h2>
+<div>
+<span id="notifCount" class="notification">0</span>
+<button onclick="logout()">Logout</button>
+</div>
+</div>
+
+<hr>
+
+<!-- PROFILE -->
+<h3 id="welcome"></h3>
+<input type="file" onchange="uploadProfile(event)">
+<br>
+<img id="profilePic" class="profile-img">
+
+<p>Followers: <span id="followers">0</span></p>
+<button onclick="follow()">Follow Me 👥</button>
+
+<hr>
+
+<!-- STORIES -->
+<h3>Stories 🔥</h3>
+<input type="text" id="storyInput" placeholder="Add Story">
+<button onclick="addStory()">Add</button>
+<div id="stories"></div>
+
+<hr>
+
+<!-- POSTS -->
+<h3>Create Post ✍️</h3>
+<input type="text" id="postInput" placeholder="What's on your mind?">
+<button onclick="addPost()">Post</button>
+
+<div id="posts"></div>
+
+</div>
+
+<script>
+
+let currentUser="";
+let followers=0;
+let notifications=0;
+
+/* LOGIN FUNCTION */
+
+function login(){
+let user=document.getElementById("username").value;
+if(user==""){
+alert("Enter username first");
+return;
+}
+currentUser=user;
+localStorage.setItem("deevoraUser",user);
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("app").style.display="block";
+document.getElementById("welcome").innerText="Hello, "+user+" 👋";
+
+}
+
+/* AUTO LOGIN */
+window.onload=function(){
+let savedUser=localStorage.getItem("deevoraUser");
+if(savedUser){
+currentUser=savedUser;
+document.getElementById("loginPage").style.display="none";
+document.getElementById("app").style.display="block";
+document.getElementById("welcome").innerText="Hello, "+savedUser+" 👋";
+}
+}
+
+/* LOGOUT */
+function logout(){
+localStorage.removeItem("deevoraUser");
+location.reload();
+}
+
+/* PROFILE UPLOAD */
+
+function uploadProfile(event){
+let reader=new FileReader();
+reader.onload=function(){
+document.getElementById("profilePic").src=reader.result;
+localStorage.setItem("profilePic",reader.result);
+}
+reader.readAsDataURL(event.target.files[0]);
+}
+
+window.onload=function(){
+let savedUser=localStorage.getItem("deevoraUser");
+if(savedUser){
+currentUser=savedUser;
+document.getElementById("loginPage").style.display="none";
+document.getElementById("app").style.display="block";
+document.getElementById("welcome").innerText="Hello, "+savedUser+" 👋";
+}
+let savedPic=localStorage.getItem("profilePic");
+if(savedPic){
+document.getElementById("profilePic").src=savedPic;
+}
+}
+
+/* FOLLOW SYSTEM */
+
+function follow(){
+followers++;
+document.getElementById("followers").innerText=followers;
+addNotification("Someone followed you 👥");
+}
+
+/* STORIES */
+
+function addStory(){
+let storyText=document.getElementById("storyInput").value;
+if(storyText=="") return;
+
+let story=document.createElement("div");
+story.className="story";
+story.innerText=storyText;
+
+document.getElementById("stories").appendChild(story);
+document.getElementById("storyInput").value="";
+
+addNotification("New story added 🔥");
+}
+
+/* POSTS */
+
+function addPost(){
+let postText=document.getElementById("postInput").value;
+if(postText=="") return;
+
+let post=document.createElement("div");
+post.className="post";
+post.innerHTML="<strong>"+currentUser+":</strong><br>"+postText;
+
+document.getElementById("posts").prepend(post);
+document.getElementById("postInput").value="";
+
+addNotification("New post created ✍️");
+}
+
+/* NOTIFICATIONS */
+
+function addNotification(msg){
+notifications++;
+document.getElementById("notifCount").innerText=notifications;
+}
+
+</script>
+
+</body>
+</html>
